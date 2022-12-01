@@ -28,5 +28,3 @@
 
 ;; answer to question 2
 ;; (apply + (take 3 (sort > (sums (map intify (split-on-empty-lines test-data))))))
-
-)
