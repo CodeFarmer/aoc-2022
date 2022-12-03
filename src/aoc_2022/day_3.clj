@@ -23,3 +23,12 @@
 
 (defn rucksack-common-item-priority [rucksack-string]
   (item-priority (rucksack-common-item rucksack-string)))
+
+;; (def test-data
+;;   (lines-as-vector "input-3.txt"))
+
+;; part 1
+;; (reduce + (map rucksack-common-item-priority test-data))
+
+;; part 2
+;; (reduce + (map item-priority (map common-item (partition 3 test-data))))

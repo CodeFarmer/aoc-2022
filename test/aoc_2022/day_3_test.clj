@@ -14,10 +14,6 @@
            (split-rucksack "PmmdzqPrVvPwwTWBwg")))))
 
 
-(deftest common-item-test
-  )
-
-
 (deftest rucksack-common-item-test
   (testing "rucksack strings should have their compartments' common items identified"
     (is (= \v (rucksack-common-item "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn")))
