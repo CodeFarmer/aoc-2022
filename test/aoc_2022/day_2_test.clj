@@ -1,6 +1,7 @@
 (ns aoc-2022.day-2-test
   (:require [clojure.test :refer :all]
             [aoc-2022.day-2 :refer :all]
+            [aoc-2022.core :refer :all]
             [clojure.string :as str]))
 
 (deftest shape-scoring-test
@@ -32,8 +33,7 @@
 ;; problems
 
 (def test-data
-  (with-open [rdr (clojure.java.io/reader "input-2.txt")]
-    (into [] (map #(str/split % #" ") (line-seq rdr)))))
+  (map #(str/split % #" ") (lines-as-vector "input-2.txt")))
 
 (deftest part-1-test
   (testing "The total should be correct when using the predetermined version of the choice encoding"
@@ -41,7 +41,7 @@
                           test-data))
            11150))))
 
-(deftest part-1-test
+(deftest part-2-test
   (testing "The total should be correct when using the predetermined version of the choice encoding"
     (is (= (reduce + (map (partial apply round-score-deliberate)
                           test-data))
