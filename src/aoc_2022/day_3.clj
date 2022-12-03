@@ -7,11 +7,12 @@
   [rucksack-string]
   (split-at (/ (count rucksack-string) 2) rucksack-string))
 
-(defn common-item [a b]
-  (first (set/intersection (into #{} a) (into #{} b))))
+;; given a seq of seqables, find the common item between all of them
+(defn common-item [aseq]
+  (first (apply set/intersection (map #(into #{} %) aseq))))
 
 (defn rucksack-common-item [rucksack-string]
-  (apply common-item (split-rucksack rucksack-string)))
+  (common-item (split-rucksack rucksack-string)))
 
 
 (defn item-priority [item-char]

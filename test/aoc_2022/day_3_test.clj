@@ -15,9 +15,7 @@
 
 
 (deftest common-item-test
-  (testing "the common item between two rucksack compartments should be identified"
-    (is (= \p (common-item (seq "vJrwpWtwJgWr") (seq "hcsFMMfFFhFp"))))
-    (is (= \L (common-item (seq "jqHRNqRjqzjGDLGL") (seq "rsFMfFZSrLrFZsSL"))))))
+  )
 
 
 (deftest rucksack-common-item-test
@@ -39,6 +37,21 @@
     (is (= 16 (rucksack-common-item-priority "vJrwpWtwJgWrhcsFMMfFFhFp")))
     (is (= 38 (rucksack-common-item-priority "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL")))
     (is (= 42 (rucksack-common-item-priority "PmmdzqPrVvPwwTWBwg")))))
+
+(deftest common-item-seq-test
+
+  (testing "the common item between two rucksack compartments should be identified"
+    (is (= \p (common-item [(seq "vJrwpWtwJgWr") (seq "hcsFMMfFFhFp")])))
+    (is (= \L (common-item [(seq "jqHRNqRjqzjGDLGL") (seq "rsFMfFZSrLrFZsSL")]))))
+  
+  (testing "The common item should be correctly identified for sequences of strings"
+    (is (= \r (common-item ["vJrwpWtwJgWrhcsFMMfFFhFp"
+                            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"
+                            "PmmdzqPrVvPwwTWBwg"])))
+    (is (= \Z (common-item ["wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn"
+                            "ttgJtRGJQctTZtZT"
+                            "CrZsJsPPZsGzwwsLwLmpwMDw"])))))
+
 ;; problems
 
 
@@ -51,3 +64,7 @@
     (is (= 8018
            (reduce + (map rucksack-common-item-priority test-data))))))
 
+(deftest part-2-test
+  (testing "the right answer for question 2 is calculated"
+    (is (= 2518
+           (reduce + (map item-priority (map common-item (partition 3 test-data))))))))
