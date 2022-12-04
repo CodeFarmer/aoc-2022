@@ -1,4 +1,5 @@
-(ns aoc-2022.day-1)
+(ns aoc-2022.day-1
+  (:require [aoc-2022.core :refer :all]))
 
 (defn split-on-empty-lines
   "Given a seq of seqables, split into subseqs using the empty sequence as a separator"
@@ -8,11 +9,6 @@
      acc
      (let [[group remainder] (split-with (complement empty?) aseq)]
        (recur (conj acc group) (rest remainder))))))
-
-(defn intify-seq
-  "Transform a sequence of strings into a sequence of integers"
-  [aseq]
-  (map #(Integer/parseInt %) aseq))
 
 (defn sums [aseq]
   "Transform a sequence of sequences of integers, into a sequence of their sums"
