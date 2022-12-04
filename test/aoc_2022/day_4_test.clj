@@ -31,6 +31,13 @@
   (testing "For the toy example, overlapping ranges are counted correctly"
     (is (= 2 (count-overlapping-ranges mini-test-data)))))
 
+(deftest partial-overlap-test
+  (testing "Ranges that overlap at all should be detected"
+    (is (partially-overlaps? [5 7] [7 9]))
+    (is (partially-overlaps? [2 8] [3 7]))
+    (is (partially-overlaps? [6 6] [4 6]))
+    (is (partially-overlaps? [2 6] [4 8]))
+    (is (not (partially-overlaps? [2 4] [6 8])))))
 
 (def test-data
   (map #(partition 2 (intify-seq (str/split % #"[,-]")))
@@ -39,4 +46,5 @@
 (deftest part-1-test
   (is (= 528 (count-overlapping-ranges test-data))))
 
-(deftest part-2-test)
+(deftest part-2-test
+  (is (= 881 (count-partial-overlaps test-data))))
