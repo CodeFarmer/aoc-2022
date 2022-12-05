@@ -21,11 +21,10 @@
 (defn move-chunk-in [start-state num-items from-stack-index to-stack-index]
   (let [fsi (dec from-stack-index)
         tsi (dec to-stack-index)
-        from-stack (get start-state fsi)
-        to-stack (get start-state tsi)]
+        from-stack (get start-state fsi)]
     (-> start-state
         (assoc fsi (drop num-items from-stack))
-        (assoc tsi (concat (take num-items from-stack) to-stack)))))
+        (assoc tsi (concat (take num-items from-stack) (get start-state tsi))))))
 
 (defn move-in [start-state num-items from-stack-index to-stack-index]
   (if (zero? num-items)
