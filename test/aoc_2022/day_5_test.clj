@@ -86,7 +86,7 @@
       (is (= ['()
               '(\C \M)
               '(\D \N \Z \P)]
-             (move-in-chunk start-state 3 1 3))))))
+             (move-chunk-in start-state 3 1 3))))))
 
 
 (def test-initial-state

@@ -7,7 +7,7 @@
   [(pop from-stack) (conj to-stack (first from-stack))])
 
 
-;; given a starting state that is a vector of stacks and two 1-indexed stack nimbers, move an item from one stack to another
+;; given a starting state that is a vector of stacks and two 1-indexed stack numbers, move an item from one stack to another
 (defn move-1-in [start-state from-stack-index to-stack-index]
   (let [fsi (dec from-stack-index)
         tsi (dec to-stack-index)
@@ -18,7 +18,7 @@
         (assoc fsi from-stack')
         (assoc tsi to-stack'))))
 
-(defn move-in-chunk [start-state num-items from-stack-index to-stack-index]
+(defn move-chunk-in [start-state num-items from-stack-index to-stack-index]
   (let [fsi (dec from-stack-index)
         tsi (dec to-stack-index)
         from-stack (get start-state fsi)
@@ -48,5 +48,5 @@
 (defn apply-chunked-moves [state moves]
   (if (empty? moves)
     state
-    (recur (apply (partial move-in-chunk state) (first moves))
+    (recur (apply (partial move-chunk-in state) (first moves))
            (rest moves))))
