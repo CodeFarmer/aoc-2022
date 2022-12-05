@@ -76,6 +76,19 @@
 (defn make-stack [stack-string]
   (reverse (into '() (seq stack-string))))
 
+
+(deftest moving-substacks-between-numbered-stacks-test
+  (testing "items can be moved between numbered stacks in substacks"
+    (let [start-state ['(\D \N \Z)
+                       '(\C \M)
+                       '(\P)]]
+
+      (is (= ['()
+              '(\C \M)
+              '(\D \N \Z \P)]
+             (move-in-chunk start-state 3 1 3))))))
+
+
 (def test-initial-state
   ;; this will teach me to hand-enter my starting state :(
   ;; turns out string-seqs aren't stacks
@@ -95,4 +108,7 @@
          (apply str
                 (map first (apply-moves test-initial-state test-data))))))
 
-(deftest part-2-test)
+(deftest part-2-test
+  (is (= "LVMRWSSPZ"
+         (apply str
+                (map first (apply-chunked-moves test-initial-state test-data))))))

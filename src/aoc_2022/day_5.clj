@@ -18,13 +18,25 @@
         (assoc fsi from-stack')
         (assoc tsi to-stack'))))
 
+(defn move-in-chunk [start-state num-items from-stack-index to-stack-index]
+  (let [fsi (dec from-stack-index)
+        tsi (dec to-stack-index)
+        from-stack (get start-state fsi)
+        to-stack (get start-state tsi)
+        from-stack' (drop num-items from-stack)
+        to-stack' (concat (take num-items from-stack) to-stack)]
+    (-> start-state
+        (assoc fsi from-stack')
+        (assoc tsi to-stack'))))
+
 (defn move-in [start-state num-items from-stack-index to-stack-index]
-  start-state
   (if (zero? num-items)
     start-state
     (recur (move-1-in start-state from-stack-index to-stack-index)
            (dec num-items)
            from-stack-index to-stack-index)))
+
+
 
 (defn parse-move [move-string]
   (into '[] (intify-seq (re-seq #"\d+" move-string))))
@@ -33,4 +45,10 @@
   (if (empty? moves)
     state
     (recur (apply (partial move-in state) (first moves))
+           (rest moves))))
+
+(defn apply-chunked-moves [state moves]
+  (if (empty? moves)
+    state
+    (recur (apply (partial move-in-chunk state) (first moves))
            (rest moves))))
