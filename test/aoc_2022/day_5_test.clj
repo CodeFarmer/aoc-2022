@@ -92,15 +92,15 @@
 (def test-initial-state
   ;; this will teach me to hand-enter my starting state :(
   ;; turns out string-seqs aren't stacks
-  (into [] (map make-stack [(seq "WRTG")
-                            (seq "WVSMPHCG")
-                            (seq "MGSTLC")
-                            (seq "FRWMDHJ")
-                            (seq "JFWSHLQP")
-                            (seq "SMFNDJP")
-                            (seq "JSCGFDBZ")
-                            (seq "BTR")
-                            (seq "CLWNH")])))
+  (into [] (map make-stack ["WRTG"
+                            "WVSMPHCG"
+                            "MGSTLC"
+                            "FRWMDHJ"
+                            "JFWSHLQP"
+                            "SMFNDJP"
+                            "JSCGFDBZ"
+                            "BTR"
+                            "CLWNH"])))
 
 
 (deftest part-1-test
