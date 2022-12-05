@@ -22,12 +22,10 @@
   (let [fsi (dec from-stack-index)
         tsi (dec to-stack-index)
         from-stack (get start-state fsi)
-        to-stack (get start-state tsi)
-        from-stack' (drop num-items from-stack)
-        to-stack' (concat (take num-items from-stack) to-stack)]
+        to-stack (get start-state tsi)]
     (-> start-state
-        (assoc fsi from-stack')
-        (assoc tsi to-stack'))))
+        (assoc fsi (drop num-items from-stack))
+        (assoc tsi (concat (take num-items from-stack) to-stack)))))
 
 (defn move-in [start-state num-items from-stack-index to-stack-index]
   (if (zero? num-items)
