@@ -15,7 +15,7 @@
 
 ;; is this efficient? of course not. Is it easy to understand? I guess?
 (defn non-repeating-string-index
-  "Find the first index after which there are len non-repeating characters in a row"
+  "Find the first index after len non-repeating characters in a row"
   ([len astr]
    (non-repeating-string-index 0 len astr))
   ([index len astr]
