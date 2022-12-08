@@ -1,6 +1,13 @@
 (ns aoc-2022.day-8
   (:require [aoc-2022.core :refer :all]))
 
+;; This problem seemed nice, but the repetition is horrible and
+;; while you can make it go away to some extent, the juice is not
+;; worth the squeeze. Blargh.
+
+;; I guess you could build a visibility map up front and just traverse
+;; each row and column once in each direction, for linear time instead
+;; of quadratic
 
 (defn ctoi [achar]
   (- (int achar) 48))
@@ -42,6 +49,27 @@
     (count (filter true? (for [x (range 0 width)
                                y (range 0 height)]
                            (visible? forest x y))))))
+
+;; an alernative solution, more code but linear-ish instead of quadratic
+;; other directions left as an exercise for the reader
+
+(defn visibility-from-left-row-map
+  ([row]
+   (visibility-from-left-row-map 0 [] row))
+  ([max-height acc row]
+   (if (empty? row)
+     acc
+     (if (< max-height (first row))
+       (recur (first row) (conj acc true) (rest row))
+       (recur max-height (conj acc false) (rest row))))))
+
+(defn visibility-from-left-forest-map [forest]
+  (into [] (map visibility-from-left-row-map forest)))
+
+(defn visible-from-left-mapped? [left-visibility-map x y]
+  (get-in left-visibility-map [y x]))
+
+;; scenic things, part 2
 
 (defn take-until
   "Take items from aseq until pred returns true, including the item that triggered pred"

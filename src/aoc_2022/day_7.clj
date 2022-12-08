@@ -2,6 +2,9 @@
   (:require [aoc-2022.core :refer :all]
             [clojure.string :as str]))
 
+;; FIXME not only was this not done on the day, it's totally clunky
+;; and depressing. All the stuff with parsing into commands and chunks
+;; and so on is terrible.
 
 (defn split-on-spaces [aseq]
   (map #(str/split % #" ") aseq))

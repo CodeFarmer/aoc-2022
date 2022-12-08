@@ -50,6 +50,22 @@
     (is (visible-from-bottom? toy-forest 2 4))
     (is (not (visible-from-right? toy-forest 2 4)))))
 
+;; partial linear solution, even more code, boring but effective
+;; still too boring to do the whole thing though
+
+(deftest toy-visibility-test-with-cache
+  (let [left-map (visibility-from-left-forest-map toy-forest)]
+    (testing "everything on the left is visible"
+      (is (visible-from-left-mapped? left-map 0 4)))
+    (testing "The top-left 5 is visible from the left"
+      (is (visible-from-left-mapped? left-map 1 1)))
+    (testing "The top-middle 5 is not visible from the left"
+      (is (not (visible-from-left-mapped? left-map 2 1))))
+    (testing "The left-middle 5 is not visible from the left"
+      (is (not (visible-from-left-mapped? left-map 1 2))))
+    (testing "The bottom middle 5 is visible"
+      (is (not (visible-from-left-mapped? left-map 2 4))))))
+
 (deftest visible-count-test
   (testing "a forest can have its visible trees counted"
     (is (= 21 (count-visible-trees toy-forest)))))
