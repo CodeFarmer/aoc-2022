@@ -77,3 +77,6 @@ R 2")
 
 (def test-moves (map parse-line (lines-as-vector "input-9.txt")))
 
+(deftest part-1-test
+  (testing "The right answer for part 1 is calculated"
+    (is (= 6503 (count (first (-process-commands #{} test-moves [0 0] [0 0])))))))
