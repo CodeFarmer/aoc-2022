@@ -73,6 +73,27 @@ R 2")
     (is (= 13
            (count (first (-process-commands #{} toy-moves [0 0] [0 0])))))))
 
+(def more-toy-data "R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20")
+
+(def more-toy-moves
+  (map parse-line (str/split more-toy-data #"\n")))
+
+;; I got tired at this point and winged it
+
+(defn rope-of-length [n]
+  (into [] (repeat n [0 0])))
+
+(deftest multi-knot-rope-test
+  (testing "A rope traces out the correct length"
+    (is (= 36 (count (first (-process-commands-rope #{} more-toy-moves (rope-of-length 10))))))))
+
 ;; Problems
 
 (def test-moves (map parse-line (lines-as-vector "input-9.txt")))
@@ -80,3 +101,7 @@ R 2")
 (deftest part-1-test
   (testing "The right answer for part 1 is calculated"
     (is (= 6503 (count (first (-process-commands #{} test-moves [0 0] [0 0])))))))
+
+(deftest part-2-test
+  (testing "The right answer to part 2 is calculated"
+    (is (= 2724 (count (first (-process-commands-rope #{} test-moves (rope-of-length 10))))))))

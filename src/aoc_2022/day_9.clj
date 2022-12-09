@@ -92,3 +92,30 @@
         (-process-commands #{} move-seq head tail)]
     [head' tail']))
 
+;; part 2 things
+
+(defn move-rope-to-head [head rope]
+  (if (empty? rope) nil
+      (let [next-knot (first rope)
+            next-knot' (move-towards head next-knot)]
+        (cons next-knot' (move-rope-to-head next-knot' (rest rope))))))
+
+(defn -move-rope-repeatedly
+  [path-set times move-fn rope]
+  (if (zero? times)
+    [path-set rope]
+    (let [head (first rope)
+          head' (move-fn head)
+          rope' (cons head' (move-rope-to-head head' (rest rope)))]
+      (recur (conj path-set (last rope')) (dec times) move-fn rope'))))
+
+(defn -move-command-rope [path-set move times rope]
+  (-move-rope-repeatedly path-set times (get move-commands move) rope))
+
+(defn -process-commands-rope [path-set move-seq rope]
+  (if (empty? move-seq)
+    [path-set rope]
+    (let [[move times] (first move-seq)
+          [path' rope'] (-move-command-rope path-set move times rope)]
+      (recur path' (rest move-seq) rope'))))
+
