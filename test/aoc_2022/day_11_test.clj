@@ -42,5 +42,18 @@ Monkey 3:
             :test-divisible 23
             :true-monkey 2
             :false-monkey 3
-            }
+            :inspected-items 0}
            (parse-monkey (first toy-monkey-strings))))))
+
+(def toy-monkeys (apply vector (map parse-monkey toy-monkey-strings)))
+
+
+(def test-monkeys (apply vector (map parse-monkey
+                                     (str/split (slurp "input-11.txt") #"\n\n"))))
+
+;; problems
+
+(deftest part-1-test
+  (testing "the level of monkey business is crrectly calculated as the product of the numbers of inspected items of the two most active monkeys after 20 rounds"
+    (is (= 118674
+           (apply * (map :inspected-items (take 2 (sort-by :inspected-items > (after-rounds test-monkeys 20)))))))))
