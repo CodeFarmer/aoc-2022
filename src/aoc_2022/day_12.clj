@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [aoc-2022.core :refer :all]))
 
+
 (defn elevation [[x y] height-map]
   (let [code (get-in height-map [y x])]
     (case code
@@ -9,7 +10,9 @@
       \E (int \z)
       (int code))))
 
+
 (defn adjacent-points [[x y] height-map]
+
   (let [width (count (first height-map))
         height (count height-map)]
     (for [dx [-1 0 1]
@@ -21,7 +24,9 @@
                       (and (= dx 0) (not (= dy 0)))))
           :when (and (>= x' 0) (>= y' 0)
                      (< x' width) (< y' height))]
+      
       [x' y'])))
+
 
 (defn possible-points [[x y] height-map]
 
@@ -31,6 +36,7 @@
           
    (adjacent-points [x y] height-map)))
 
+
 (defn find-start [height-map]
   (let [width (count (first height-map))
         height (count height-map)]
@@ -38,6 +44,7 @@
                    (for [x (range 0 width)
                          y (range 0 height)]
                      [x y])))))
+
 
 (defn shortest-legal-path
   ([height-map]
@@ -53,9 +60,10 @@
      []
      (let [path (peek q)
            [x y] (first path)]
+
        (if (= \E (get-in height-map [y x]))
-         ;; FIXME need to return whole path here
          path
+         
          (let [unseen-neighbours (filter (complement seen-set)
                                          (possible-points [x y] height-map))]
            (recur (into (pop q) (map #(cons % path) unseen-neighbours))
