@@ -23,33 +23,44 @@
    :inspected-items 0})
 
 
-(defn process-monkey-items [monkey monkeys]
-  
-  (let [items (:items monkey)]
+(defn process-monkey-items
+  ([monkey monkeys]
+   (process-monkey-items monkey monkeys #(quot % 3)))
+  ([monkey monkeys calming-fn]
 
-    (if (empty? items)
-      (assoc monkeys (:number monkey) monkey)
+   (let [items (:items monkey)]
 
-      (let [item (first items)
-            new-item-value ((apply partial (:operation monkey)) item)
-            adjusted-item-value (quot new-item-value 3)
-            inspected-items (:inspected-items monkey)
-            monkey' (-> monkey
-                        (assoc :items (apply vector (rest items)))
-                        (update-in [:inspected-items] inc))]
-        
-        (if (= 0 (mod adjusted-item-value (:test-divisible monkey)))
-          (recur monkey' (update-in monkeys [(:true-monkey monkey) :items] conj adjusted-item-value))
-          (recur monkey' (update-in monkeys [(:false-monkey monkey) :items] conj adjusted-item-value)))))))
+     (if (empty? items)
+       (assoc monkeys (:number monkey) monkey)
+
+       (let [item (first items)
+             new-item-value ((apply partial (:operation monkey)) item)
+             adjusted-item-value (calming-fn new-item-value)
+             inspected-items (:inspected-items monkey)
+             monkey' (-> monkey
+                         (assoc :items (apply vector (rest items)))
+                         (update-in [:inspected-items] inc))]
+         
+         (if (= 0 (mod adjusted-item-value (:test-divisible monkey)))
+           (recur monkey' (update-in monkeys [(:true-monkey monkey) :items] conj adjusted-item-value) calming-fn)
+           (recur monkey' (update-in monkeys [(:false-monkey monkey) :items] conj adjusted-item-value) calming-fn)))))))
 
 (defn process-all-monkeys
   ([monkeys]
    (process-all-monkeys 0 monkeys))
   ([index monkeys]
+   (process-all-monkeys 0 monkeys #(quot % 3)))
+  
+  ([index monkeys calming-fn]
    (if (= index (count monkeys))
      monkeys
-     (recur (inc index) (process-monkey-items (get monkeys index) monkeys)))))
+     (recur (inc index) (process-monkey-items (get monkeys index) monkeys calming-fn) calming-fn))))
 
-(defn after-rounds [monkeys rounds]
-  (nth (iterate process-all-monkeys monkeys) rounds))
+(defn after-rounds
+  ([monkeys rounds]
+   (after-rounds monkeys rounds #(quot % 3)))
+  ([monkeys rounds calming-fn]
+   (nth (iterate #(process-all-monkeys 0 % calming-fn) monkeys) rounds)))
 
+(defn monkey-business [monkeys]
+  (apply * (take 2 (sort > (map :inspected-items monkeys)))))
