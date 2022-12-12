@@ -48,10 +48,29 @@ abdefghi"
   (testing "The start of the test data is located correctly"
     (is (= [0 20] (find-start test-map)))))
 
-;; problems
-
 (deftest breadth-first-search-test
   (testing "the shortest legal path in the toy data is found"
     ;; my path inludes the start, so 31 steps
     (is (= 32 (count (shortest-legal-path toy-map))))))
 
+(deftest find-best-lowest-point-test
+  (testing "The shortest path, with 29 steps, is found from a low point to the destination"
+    (is (= 30 
+           (count (first (sort-by count (map #(shortest-legal-path (conj (clojure.lang.PersistentQueue/EMPTY)
+                                                                         (list %)) #{} toy-map) (find-all-lowest-points toy-map)))))))))
+
+;; problems
+
+(deftest part-1-test
+  (testing "The correct answer to part 1 is found"
+    (is (= 371 (count (shortest-legal-path test-map))))))
+
+(deftest find-best-lowest-point-test
+  (testing "The shortest path, with 29 steps, is found from a low point to the destination"
+    (is (= 30 
+           (count (shortest-from-lowest toy-map))))))
+
+(deftest part-2-test
+  (testing "The best path, with 363 steps, is found from a low point to the destination in the test data"
+    (is (= 364
+           (count (shortest-from-lowest test-map))))))

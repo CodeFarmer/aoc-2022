@@ -62,3 +62,23 @@
                   (into seen-set unseen-neighbours)
                   height-map))))
      )))
+
+
+(defn find-all-lowest-points [height-map]
+  (let [width (count (first height-map))
+        height (count height-map)]
+    (for [x (range 0 width)
+          y (range 0 height)
+          :when (= \a (get-in height-map [y x]))]
+      [x y])))
+
+(defn shortest-from-lowest [height-map]
+  ;; the empty? is there becaues it turns out some lowest points can't reach the top at all
+  (first
+   (drop-while empty?
+               (sort-by count
+                        (map #(shortest-legal-path
+                               (conj (clojure.lang.PersistentQueue/EMPTY) (list %))
+                               #{}
+                               height-map)
+                             (find-all-lowest-points height-map))))))
