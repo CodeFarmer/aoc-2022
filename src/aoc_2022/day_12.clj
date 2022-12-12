@@ -47,6 +47,7 @@
 
 
 (defn shortest-legal-path
+
   ([height-map]
    (shortest-legal-path
     (conj (clojure.lang.PersistentQueue/EMPTY)
