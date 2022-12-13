@@ -82,12 +82,9 @@
       [x y])))
 
 (defn shortest-from-lowest [height-map]
-  ;; the empty? is there becaues it turns out some lowest points can't reach the top at all
-  (first
-   (drop-while empty?
-               (sort-by count
-                        (map #(shortest-legal-path
-                               (conj (clojure.lang.PersistentQueue/EMPTY) (list %))
-                               #{}
-                               height-map)
-                             (find-all-lowest-points height-map))))))
+  
+  (let [starting-points (find-all-lowest-points height-map)]
+    (shortest-legal-path
+          (into (clojure.lang.PersistentQueue/EMPTY) (map list starting-points))
+          (into #{} starting-points)
+          height-map)))
