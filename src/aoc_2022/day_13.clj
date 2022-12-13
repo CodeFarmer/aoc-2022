@@ -36,3 +36,14 @@
      (if (apply lless-than (first pair-list))
        (recur (conj acc index) (inc index) (rest pair-list))
        (recur acc (inc index) (rest pair-list))))))
+
+(defn indices-matching
+  "Return 1-based indices for all the items in aseq where fn returns truthy"
+  ([fn aseq]
+   (indices-matching [] 1 fn aseq))
+  ([acc index fn aseq]
+   (if (empty? aseq)
+     acc
+     (if (fn (first aseq))
+       (recur (conj acc index) (inc index) fn (rest aseq))
+       (recur acc (inc index) fn (rest aseq))))))

@@ -65,3 +65,11 @@
 (deftest part-1-test
   (testing "The correct indices that are already ordered are identified in the test data"
     (is (= 5843 (reduce + (ordered-indices test-pairs))))))
+
+(def test-packets (into '([[2]] [[6]])
+                        (map edn/read-string (filter (complement empty?) (str/split (slurp "input-13.txt") #"\n")))))
+
+(deftest part-2-test
+  (testing "The decoder key for the test data is correctly found"
+    (is (= 26289
+           (apply * (indices-matching #{[[2]] [[6]]} (sort lless-than test-packets)))))))
