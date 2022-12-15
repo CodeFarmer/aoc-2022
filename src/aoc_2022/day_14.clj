@@ -93,20 +93,36 @@
           [cave sand]
           :default (recur cave sand [x' y']))))
 
+;; part 2
+
+(defn drop-sand-infinite-floor [cave sand grain]
+  (let [[[minx miny] [maxx maxy]] (cave-bounds cave)
+        [x' y'] (tick cave sand grain)]
+    (cond (= grain [x' y']) ;; grain has stopped
+          [cave (conj sand grain)]
+          (> y' (inc maxy)) ;; hit the floor
+          [cave (conj sand grain)]
+          :default (recur cave sand [x' y']))))
 
 (defn -drop-a-lot-of-sand
-  [cave sand starting-point]
-  (iterate (fn [[cave sand]] (drop-sand cave sand starting-point))
-           [cave sand]))
+  ([cave sand drop-fn starting-point]
+   (iterate (fn [[cave sand]] (drop-fn cave sand starting-point))
+            [cave sand])))
 
 (defn drop-a-lot-of-sand
-  [cave sand n starting-point]
-  (nth (-drop-a-lot-of-sand cave sand starting-point) n))
+  ([cave sand n starting-point]
+   (drop-a-lot-of-sand cave sand drop-sand n starting-point))
+  ([cave sand drop-fn n starting-point]
+   (nth (-drop-a-lot-of-sand cave sand drop-fn starting-point) n)))
 
 (defn last-caught-sand
-  [cave sand starting-point]
-  (loop [index 0
-         state-pairs (partition 2 1 (-drop-a-lot-of-sand cave sand starting-point))]
-    (if (apply = (first state-pairs))
-      index
-      (recur (inc index) (rest state-pairs)))))
+  ([cave sand starting-point]
+   (last-caught-sand cave sand drop-sand starting-point))
+  ([cave sand drop-fn starting-point]
+   (loop [index 0
+          state-pairs (partition 2 1 (-drop-a-lot-of-sand cave sand drop-fn starting-point))]
+     (comment (if (= 0 (mod index 100))
+                (println (apply ctos (first (first state-pairs))) "\n" index "\n")))
+     (if (apply = (first state-pairs))
+       index
+       (recur (inc index) (rest state-pairs))))))

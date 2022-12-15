@@ -80,7 +80,10 @@
 
 (deftest steady-state-detection-test
   (testing "After 24 drops, no more sand accumulates"
-    (is (= 24 (last-caught-sand toy-cave #{} [500 1])))))
+    (is (= 24 (last-caught-sand toy-cave #{} [500 1]))))
+  (testing "After 93 drops, no more sand accumulates when we assume an infinite floor 2 units below the lowest stone"
+    (is (= 93 (last-caught-sand toy-cave #{} drop-sand-infinite-floor [500 0])))))
+
 
 ;; problems
 
@@ -88,3 +91,12 @@
 
 (deftest part-1-test
   (is (= 805 (last-caught-sand test-cave #{} [500 1]))))
+
+;; FIXME this currently takes several minutes to run and I suspect
+;; it's the set membership operations getting really expensive for
+;; vectors when n is really big
+;;
+;; refactor to not use sets, just fill a big grid and look for nearby
+;; obstacles
+(deftest part-2-test
+  (is (= 25161 (last-caught-sand test-cave #{} drop-sand-infinite-floor [500 0]))))
