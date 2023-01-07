@@ -91,7 +91,7 @@
                                [x y c]))))))
 
   (drop-sand [self grain]
-    (let [[[minx miny] [maxx maxy]] (bounds self)
+    (let [[[minx miny] [maxx maxy]] (-set-cave-bounds stone-set)
           [x' y'] (-set-cave-tick stone-set sand-set grain)]
       (cond (= grain [x' y']) ;; grain has stopped
             (SetCave. stone-set (conj sand-set grain))
@@ -102,7 +102,7 @@
             :default (recur [x' y']))))
 
   (drop-sand-infinite-floor [self grain]
-    (let [[[minx miny] [maxx maxy]] (bounds self)
+    (let [[[minx miny] [maxx maxy]] (-set-cave-bounds stone-set)
           [x' y'] (-set-cave-tick stone-set sand-set grain)]
       (cond (= grain [x' y']) ;; grain has stopped
             (SetCave. stone-set (conj sand-set grain))
@@ -137,8 +137,9 @@
   ([cave drop-fn starting-point]
    (loop [index 0
           state-pairs (partition 2 1 (-drop-a-lot-of-sand cave drop-fn starting-point))]
-     (comment (if (= 0 (mod index 100))
-                (println (apply ctos (first (first state-pairs))) "\n" index "\n")))
+     (comment 
+       (if (= 0 (mod index 100))
+         (println (to-string (first (first state-pairs))) "\n" index "\n")))
      (if (apply = (first state-pairs))
        index
        (recur (inc index) (rest state-pairs))))))
