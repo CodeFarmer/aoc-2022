@@ -120,7 +120,10 @@
 ;; sparse nested-vector implementation
 
 (defn -vector-with-stone [avec width height [x y]]
-  (assoc avec (+ x (* y height)) \#))
+  (if (>= x width)
+    ;; this should be some kind of IndexOutOfBounds I guess
+    (throw (IllegalArgumentException. (str "Attempt to place stone too wide: " x " (max " (dec width) ")")))
+    (assoc avec (+ x (* y height)) \#)))
 
 (defn -vector-line-between [avec width height start end]
   (reduce (fn [v point] (-vector-with-stone v width height point))

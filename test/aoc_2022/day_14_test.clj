@@ -36,7 +36,7 @@
 (println "\ntoy-set-cave\n")
 (println (to-string toy-set-cave))
 
-(def toy-vec-cave (all-rock-paths (vector-cave 100 100) toy-paths))
+(def toy-vec-cave (all-rock-paths (vector-cave 510 510) toy-paths))
 (println "\ntoy-vec-cave\n")
 (println (to-string toy-vec-cave))
 
