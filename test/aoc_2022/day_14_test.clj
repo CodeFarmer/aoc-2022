@@ -32,7 +32,13 @@
     (is (= #{[497 6] [498 5] [496 6] [498 6] [498 4]}
            (:stone-set (rock-path (set-cave) (first toy-paths)))))))
 
-(def toy-cave (all-rock-paths (set-cave) toy-paths))
+(def toy-set-cave (all-rock-paths (set-cave) toy-paths))
+(println "\ntoy-set-cave\n")
+(println (to-string toy-set-cave))
+
+(def toy-vec-cave (all-rock-paths (vector-cave 100 100) toy-paths))
+(println "\ntoy-vec-cave\n")
+(println (to-string toy-vec-cave))
 
 (deftest multi-multi-segment-test
   (is (= "....#...##
@@ -41,21 +47,21 @@
 ........#.
 ........#.
 #########."
-         (to-string toy-cave))))
+         (to-string toy-vec-cave))))
 
 (deftest moving-sand-test
   (testing "sand will drop directly down one unit if it can"
     (is (= [500 2]
-           (-set-cave-tick #{} #{} [500 1]))))
+           (tick (set-cave) [500 1]))))
   (testing "sand will drop diagonally down-left one unit if it can't go straight down"
     (is (= [499 2]
-           (-set-cave-tick #{[500 2]} #{} [500 1]))))
+           (tick (->SetCave #{[500 2]} #{}) [500 1]))))
   (testing "sand will drop diagonally down-right one unit if it can't go straight down or down-left"
     (is (= [501 2]
-           (-set-cave-tick #{[500 2] [499 2]} #{} [500 1]))))
+           (tick (->SetCave #{[500 2] [499 2]} #{}) [500 1]))))
   (testing "a grain which can do none of these things will stay where it is"
     (is (= [500 1]
-           (-set-cave-tick #{[499 2] [500 2] [501 2]} #{} [500 1])))))
+           (tick (->SetCave #{[499 2] [500 2] [501 2]} #{}) [500 1])))))
 
 (def dropping-sand-test
   (testing "dropping a single grain of sand into a cave works correctly"
@@ -65,7 +71,7 @@
 ........#.
 ......o.#.
 #########."
-           (to-string (drop-sand toy-cave [500 1]))))))
+           (to-string (drop-sand toy-set-cave [500 1]))))))
 
 (deftest dropping-lots-of-sand-test
   (testing "Dropping consecutive grains of sand builds up as expected"
@@ -77,13 +83,13 @@
 ....oooo#.
 ...ooooo#.
 #########."
-           (to-string (drop-a-lot-of-sand toy-cave 22 [500 1]))))))
+           (to-string (drop-a-lot-of-sand toy-set-cave 22 [500 1]))))))
 
 (deftest steady-state-detection-test
   (testing "After 24 drops, no more sand accumulates"
-    (is (= 24 (last-caught-sand toy-cave [500 1]))))
+    (is (= 24 (last-caught-sand toy-set-cave [500 1]))))
   (testing "After 93 drops, no more sand accumulates when we assume an infinite floor 2 units below the lowest stone"
-    (is (= 93 (last-caught-sand toy-cave drop-sand-infinite-floor [500 0])))))
+    (is (= 93 (last-caught-sand toy-set-cave drop-sand-infinite-floor [500 0])))))
 
 
 ;; problems

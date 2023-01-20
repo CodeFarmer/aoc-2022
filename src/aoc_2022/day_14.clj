@@ -10,6 +10,7 @@
   (bounds [self])
   (rock-path [self point-seq])
   (to-string [self])
+  (tick [self point])
   (drop-sand [self grain])
   (drop-sand-infinite-floor [self grain]))
 
@@ -33,32 +34,18 @@
   [cave sand]
   (-set-cave-bounds (into cave sand)))
 
-(defn -set-line-between [[x1 y1] [x2 y2]]
+(defn points-between [[x1 y1] [x2 y2]]
+  (for [x (if (> x2 x1 )
+            (range x1 (inc x2))
+            (range x2 (inc x1)))
+        y (if (> y2 y1)
+            (range y1 (inc y2))
+            (range y2 (inc y1)))]
+    [x y]))
+
+(defn -set-line-between [start end]
   (into #{}
-        (for [x (if (> x2 x1 )
-                  (range x1 (inc x2))
-                  (range x2 (inc x1)))
-              y (if (> y2 y1)
-                  (range y1 (inc y2))
-                  (range y2 (inc y1)))]
-          [x y])))
-
-(defn -set-cave-tick
-  [cave sand [grain-x grain-y]]
-  (let [straight-down [grain-x (inc grain-y)]
-        down-left [(dec grain-x) (inc grain-y)]
-        down-right [(inc grain-x) (inc grain-y)]]
-    (cond (not (or (cave straight-down)
-                   (sand straight-down)))
-          straight-down
-          (not (or (cave down-left)
-                   (sand down-left)))
-          down-left
-          (not (or (cave down-right)
-                   (sand down-right)))
-          down-right
-          :default [grain-x grain-y])))
-
+        (points-between start end)))
 
 (defrecord SetCave [stone-set sand-set]
   
@@ -90,9 +77,24 @@
                                                \.))]]
                                [x y c]))))))
 
+  (tick [self [grain-x grain-y]]
+    (let [straight-down [grain-x (inc grain-y)]
+          down-left [(dec grain-x) (inc grain-y)]
+          down-right [(inc grain-x) (inc grain-y)]]
+      (cond (not (or (stone-set straight-down)
+                     (sand-set straight-down)))
+            straight-down
+            (not (or (stone-set down-left)
+                     (sand-set down-left)))
+            down-left
+            (not (or (stone-set down-right)
+                     (sand-set down-right)))
+            down-right
+            :default [grain-x grain-y])))
+  
   (drop-sand [self grain]
     (let [[[minx miny] [maxx maxy]] (-set-cave-bounds stone-set)
-          [x' y'] (-set-cave-tick stone-set sand-set grain)]
+          [x' y'] (tick self grain)]
       (cond (= grain [x' y']) ;; grain has stopped
             (SetCave. stone-set (conj sand-set grain))
             (or (< x' minx)
@@ -103,16 +105,72 @@
 
   (drop-sand-infinite-floor [self grain]
     (let [[[minx miny] [maxx maxy]] (-set-cave-bounds stone-set)
-          [x' y'] (-set-cave-tick stone-set sand-set grain)]
+          [x' y'] (tick self grain)]
       (cond (= grain [x' y']) ;; grain has stopped
             (SetCave. stone-set (conj sand-set grain))
             (> y' (inc maxy)) ;; hit the floor
             (SetCave. stone-set (conj sand-set grain))
             :default (recur [x' y'])))))
 
+
 (defn set-cave []
   (SetCave. #{} #{}))
 
+
+;; sparse nested-vector implementation
+
+(defn -vector-with-stone [avec width height [x y]]
+  (assoc avec (+ x (* y height)) \#))
+
+(defn -vector-line-between [avec width height start end]
+  (reduce (fn [v point] (-vector-with-stone v width height point))
+          avec
+          (points-between start end)))
+
+(defrecord VectorCave [width height rocks-and-sand-vec]
+
+  Cave
+
+  ;; FIXME this is super wrong now, have to skip the empty bits
+  (bounds [self]
+    (let [[minx miny maxx maxy]
+          (reduce 
+           (fn [[minx miny maxx maxy] [x y]]
+             (if (get rocks-and-sand-vec (+ x (* y height)))
+               [(min x minx)
+                (min y miny)
+                (max x maxx)
+                (max y maxy)]
+               [minx miny maxx maxy]))
+           [width height 0 0]
+           (for [x (range 0 width)
+                 y (range 0 height)]
+             [x y]))]
+      [[minx miny] [maxx maxy]]))
+
+  (rock-path [self point-seq]
+    (VectorCave. width height (reduce (fn [v [start end]]
+                                        (-vector-line-between v width height start end))
+                                      rocks-and-sand-vec
+                                      (partition 2 1 point-seq))))
+
+  ;; TODO this and the SetCave version are really similar
+  (to-string [self]
+    (str/join "\n"
+              (map (partial apply str)
+                   (let [[[minx miny] [maxx maxy]] (bounds self)
+                         height' (inc (- maxy miny))]
+                     (reduce (fn [acc [x y c]]
+                               (assoc-in acc [(- y miny) (- x minx)] c))
+                             (apply vector (repeat height' []))
+                             (for [x (range minx (inc maxx))
+                                   y (range miny (inc maxy))
+                                   :let [c (or (get rocks-and-sand-vec (+ x (* height y))) \.)]]
+                               [x y c]))))))
+)
+
+(defn vector-cave [width height]
+  (VectorCave. width height (into [] (repeat (* width height) nil))))
 
 (defn all-rock-paths [cave paths]
   (reduce rock-path cave paths))
