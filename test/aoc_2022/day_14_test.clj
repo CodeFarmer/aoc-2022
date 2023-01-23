@@ -50,6 +50,7 @@
          (to-string toy-vec-cave))))
 
 (deftest moving-sand-test
+  
   (testing "sand will drop directly down one unit if it can"
     (is (= [500 2]
            (tick (set-cave) [500 1]))))
@@ -63,8 +64,8 @@
     (is (= [500 1]
            (tick (->SetCave #{[499 2] [500 2] [501 2]} #{}) [500 1])))))
 
-(def dropping-sand-test
-  (testing "dropping a single grain of sand into a cave works correctly"
+(deftest dropping-sand-set-test
+  (testing "dropping a single grain of sand into a set cave works correctly"
     (is (= "....#...##
 ....#...#.
 ..###...#.
@@ -73,7 +74,17 @@
 #########."
            (to-string (drop-sand toy-set-cave [500 1]))))))
 
-(deftest dropping-lots-of-sand-test
+(deftest dropping-sand-vector-test
+  (testing "dropping a single grain of sand into a vector cave works correctly"
+    (is (= "....#...##
+....#...#.
+..###...#.
+........#.
+......o.#.
+#########."
+           (to-string (drop-sand toy-vec-cave [500 1]))))))
+
+(deftest dropping-lots-of-sand-set-test
   (testing "Dropping consecutive grains of sand builds up as expected"
     (is (= "......o...
 .....ooo..
@@ -85,16 +96,36 @@
 #########."
            (to-string (drop-a-lot-of-sand toy-set-cave 22 [500 1]))))))
 
-(deftest steady-state-detection-test
+(deftest dropping-lots-of-sand-vec-test
+  (testing "Dropping consecutive grains of sand builds up as expected"
+    (is (= "......o...
+.....ooo..
+....#ooo##
+....#ooo#.
+..###ooo#.
+....oooo#.
+...ooooo#.
+#########."
+           (to-string (drop-a-lot-of-sand toy-vec-cave 22 [500 1]))))))
+
+(deftest steady-state-detection-set-test
   (testing "After 24 drops, no more sand accumulates"
     (is (= 24 (last-caught-sand toy-set-cave [500 1]))))
   (testing "After 93 drops, no more sand accumulates when we assume an infinite floor 2 units below the lowest stone"
     (is (= 93 (last-caught-sand toy-set-cave drop-sand-infinite-floor [500 0])))))
 
+(deftest steady-state-detection-vec-test
+  (testing "After 24 drops, no more sand accumulates"
+    (is (= 24 (last-caught-sand toy-vec-cave [500 1]))))
+  (comment "FIXME not implemented yet"
+    (testing "After 93 drops, no more sand accumulates when we assume an infinite floor 2 units below the lowest stone"
+      (is (= 93 (last-caught-sand toy-vec-cave drop-sand-infinite-floor [500 0]))))))
+
 
 ;; problems
 
-(def test-cave (all-rock-paths (set-cave) (map parse-path (lines-as-vector "input-14.txt"))))
+;; (def test-cave (all-rock-paths (set-cave) (map parse-path (lines-as-vector "input-14.txt"))))
+(def test-cave (all-rock-paths (vector-cave 600 600) (map parse-path (lines-as-vector "input-14.txt"))))
 
 (deftest part-1-test
   (is (= 805 (last-caught-sand test-cave [500 1]))))

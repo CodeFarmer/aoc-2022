@@ -119,16 +119,27 @@
 
 ;; sparse nested-vector implementation
 
-(defn -vector-with-stone [avec width height [x y]]
+
+(defn -vector-with-thing [avec width height [x y] thing]
   (if (>= -1 x width)
     ;; this should be some kind of IndexOutOfBounds I guess
     (throw (IllegalArgumentException. (str "Attempt to place stone too wide: " x " (min 0, max " (dec width) ")")))
-    (assoc avec (+ x (* y height)) \#)))
+    (assoc avec (+ x (* y height)) thing)))
+
+(defn -vector-with-stone [avec width height [x y]]
+  (-vector-with-thing avec width height [x y] \#))
+
+(defn -vector-with-sand [avec width height [x y]]
+  (-vector-with-thing avec width height [x y] \o))
 
 (defn -vector-line-between [avec width height start end]
   (reduce (fn [v point] (-vector-with-stone v width height point))
           avec
           (points-between start end)))
+
+;; TODO get-contents and with-stone should be in Cave
+(defn -vector-get-contents [avec width height [x y]]
+  (get avec (+ x (* width y))))
 
 (defrecord VectorCave [width height rocks-and-sand-vec]
 
@@ -136,6 +147,7 @@
 
   ;; FIXME this is super wrong now, have to skip the empty bits
   (bounds [self]
+
     (let [[minx miny maxx maxy]
           (reduce 
            (fn [[minx miny maxx maxy] [x y]]
@@ -170,7 +182,31 @@
                                    y (range miny (inc maxy))
                                    :let [c (or (get rocks-and-sand-vec (+ x (* height y))) \.)]]
                                [x y c]))))))
-)
+
+  (tick [self [grain-x grain-y]]
+    (let [straight-down [grain-x (inc grain-y)]
+          down-left [(dec grain-x) (inc grain-y)]
+          down-right [(inc grain-x) (inc grain-y)]]
+      (cond (not (-vector-get-contents rocks-and-sand-vec width height straight-down))
+            straight-down
+            (not (-vector-get-contents rocks-and-sand-vec width height down-left))
+            down-left
+            (not (-vector-get-contents rocks-and-sand-vec width height down-right))
+            down-right
+            :default [grain-x grain-y])))
+
+  (drop-sand [self grain]
+    (let [[[minx miny] [maxx maxy]] (bounds self)
+          [x' y'] (tick self grain)]
+      (cond (= grain [x' y']) ;; grain has stopped
+            (VectorCave. width height (-vector-with-sand rocks-and-sand-vec width height grain))
+            (or (< x' minx)
+                (> x' maxx)
+                (> y' maxy)) ;; fallen off the map
+            self
+            :default (recur [x' y']))))
+  
+  )
 
 (defn vector-cave [width height]
   (VectorCave. width height (into [] (repeat (* width height) nil))))
@@ -198,9 +234,9 @@
   ([cave drop-fn starting-point]
    (loop [index 0
           state-pairs (partition 2 1 (-drop-a-lot-of-sand cave drop-fn starting-point))]
-     (comment 
-       (if (= 0 (mod index 100))
-         (println (to-string (first (first state-pairs))) "\n" index "\n")))
+     (comment ) 
+     (if (= 0 (mod index 2))
+       (println (to-string (first (first state-pairs))) "\n" index "\n"))
      (if (apply = (first state-pairs))
        index
        (recur (inc index) (rest state-pairs))))))
