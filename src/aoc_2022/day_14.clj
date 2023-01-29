@@ -86,7 +86,7 @@
            :default [grain-x grain-y]))))
 
 
-(defn -drop-sand [cave sand grain]
+(defn drop-sand [cave sand grain]
   (let [[[minx miny] [maxx maxy]] (cave-bounds cave)
         [x' y'] (tick cave sand grain)]
     (cond (= grain [x' y']) ;; grain has stopped
@@ -96,9 +96,6 @@
               (> y' maxy)) ;; fallen off the map
           [cave sand]
           :default (recur cave sand [x' y']))))
-
-(defn drop-sand [cave sand grain]
-  (-drop-sand cave sand grain))
 
 ;; part 2
 
