@@ -16,10 +16,10 @@
 
 (deftest line-between-test
   (testing "a vertical line between the first two points is the set of all points between them inclusive"
-    (is (= #{[498 4] [498 5] [498 6]}
+    (is (= [[498 4] [498 5] [498 6]]
            (line-between [498 4] [498 6]))))
   (testing "a vertical line between the second two points"
-    (is (= #{[496 6] [497 6] [498 6]}
+    (is (= [[496 6] [497 6] [498 6]]
            (line-between [498 6] [496 6]))))
   (testing "a line between two points is the same whichever way the points are ordered"
     (is (= (line-between [498 6] [496 6])
@@ -90,13 +90,8 @@
 (def test-cave (all-rock-paths #{} (map parse-path (lines-as-vector "input-14.txt"))))
 
 (deftest part-1-test
-  (is (= 805 (last-caught-sand test-cave #{} [500 1]))))
+  (is (= 805
+         (last-caught-sand test-cave #{} [500 1]))))
 
-;; FIXME this currently takes several minutes to run and I suspect
-;; it's the set membership operations getting really expensive for
-;; vectors when n is really big
-;;
-;; refactor to not use sets, just fill a big grid and look for nearby
-;; obstacles
 (deftest part-2-test
   (is (= 25161 (last-caught-sand test-cave #{} drop-sand-infinite-floor [500 0]))))

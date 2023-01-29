@@ -2,14 +2,15 @@
   (:require [clojure.string :as str]
             [aoc-2022.core :refer :all]))
 
+
 (defn parse-path [line]
   (map #(intify-seq (str/split % #","))
        (str/split line #" -> "))) 
 
 
-(defn cave-bounds
+(defn -cave-bounds
   ([cave]
-   (cave-bounds [Integer/MAX_VALUE Integer/MAX_VALUE]
+   (-cave-bounds [Integer/MAX_VALUE Integer/MAX_VALUE]
                 [Integer/MIN_VALUE Integer/MIN_VALUE]
                 cave))
   ([[minx miny] [maxx maxy] cave]
@@ -22,19 +23,21 @@
            maxy' (max maxy y)]
        (recur [minx' miny'] [maxx' maxy'] (rest cave))))))
 
+(def cave-bounds
+  (memoize -cave-bounds))
+
 (defn cave-bounds-with-sand
   [cave sand]
   (cave-bounds (into cave sand)))
 
 (defn line-between [[x1 y1] [x2 y2]]
-  (into #{}
-        (for [x (if (> x2 x1 )
-                  (range x1 (inc x2))
-                  (range x2 (inc x1)))
-              y (if (> y2 y1)
-                  (range y1 (inc y2))
-                  (range y2 (inc y1)))]
-          [x y])))
+  (for [x (if (> x2 x1 )
+            (range x1 (inc x2))
+            (range x2 (inc x1)))
+        y (if (> y2 y1)
+            (range y1 (inc y2))
+            (range y2 (inc y1)))]
+    [x y]))
 
 (defn rock-path [cave path]
   (reduce into cave (map (partial apply line-between) (partition 2 1 path))))
@@ -82,7 +85,8 @@
            down-right
            :default [grain-x grain-y]))))
 
-(defn drop-sand [cave sand grain]
+
+(defn -drop-sand [cave sand grain]
   (let [[[minx miny] [maxx maxy]] (cave-bounds cave)
         [x' y'] (tick cave sand grain)]
     (cond (= grain [x' y']) ;; grain has stopped
@@ -92,6 +96,9 @@
               (> y' maxy)) ;; fallen off the map
           [cave sand]
           :default (recur cave sand [x' y']))))
+
+(defn drop-sand [cave sand grain]
+  (-drop-sand cave sand grain))
 
 ;; part 2
 
@@ -115,9 +122,9 @@
   ([cave sand drop-fn n starting-point]
    (nth (-drop-a-lot-of-sand cave sand drop-fn starting-point) n)))
 
-(defn last-caught-sand
+(defn -last-caught-sand
   ([cave sand starting-point]
-   (last-caught-sand cave sand drop-sand starting-point))
+   (-last-caught-sand cave sand drop-sand starting-point))
   ([cave sand drop-fn starting-point]
    (loop [index 0
           state-pairs (partition 2 1 (-drop-a-lot-of-sand cave sand drop-fn starting-point))]
@@ -126,3 +133,9 @@
      (if (apply = (first state-pairs))
        index
        (recur (inc index) (rest state-pairs))))))
+
+(defn last-caught-sand
+  ([cave sand starting-point]
+   (-last-caught-sand cave sand starting-point))
+  ([cave sand drop-fn starting-point]
+   (-last-caught-sand cave sand drop-fn starting-point)))
